@@ -3,8 +3,8 @@ import { Typography } from '@material-ui/core';
 import wordsToNumbers from 'words-to-numbers';
 import alanBtn from '@alan-ai/alan-sdk-web';
 
-import logo from './images/logo.png';
-import { NewsCards, Modal } from './components';
+import Modal from './components/Modal/Modal';
+import NewsCards from './components/NewsCards';
 import useStyles from './styles';
 
 const App = () => {
@@ -55,16 +55,6 @@ const App = () => {
       </div>
       <NewsCards articles={newsArticles} activeArticle={activeArticle} />
       <Modal isOpen={isOpen} setIsOpen={setIsOpen} />
-      {!newsArticles.length ? (
-        <div className={classes.footer}>
-          <Typography variant="body1" component="h2">
-            Created by
-            <a className={classes.link} href="https://www.linkedin.com/in/adrian-hajdin/"> Adrian Hajdin</a> -
-            <a className={classes.link} href="http://youtube.com/javascriptmastery"> JavaScript Mastery</a>
-          </Typography>
-          <img className={classes.image} src={logo} height="50px" alt="JSMastery logo" />
-        </div>
-      ) : null}
     </div>
   );
 };
