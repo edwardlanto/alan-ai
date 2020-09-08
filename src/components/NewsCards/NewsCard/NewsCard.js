@@ -1,48 +1,45 @@
-import React from 'react';
-import { Grid, Grow, Typography } from '@material-ui/core';
+import React, { useState, useEffect, createRef } from 'react';
+import { Card, CardActions, CardActionArea, CardContent, CardMedia, Button, Typography } from '@material-ui/core';
+import classNames from 'classnames';
 
-import NewsCard from './NewsCard';
-import useStyles from './styles.js';
+import useStyles from './styles';
 
-const infoCards = [
-  { color: '#00838f', title: 'Latest News', text: 'Give me the latest news' },
-  { color: '#1565c0', title: 'News by Categories', info: 'Business, Entertainment, General, Health, Science, Sports, Technology', text: 'Give me the latest Technology news' },
-  { color: '#4527a0', title: 'News by Terms', info: 'Bitcoin, PlayStation 5, Smartphones, Donald Trump...', text: 'What\'s up with PlayStation 5' },
-  { color: '#283593', title: 'News by Sources', info: 'CNN, Wired, BBC News, Time, IGN, Buzzfeed, ABC News...', text: 'Give me the news from CNN' },
-];
-
-const NewsCards = ({ articles, activeArticle }) => {
+const NewsCard = ({ article: { description, publishedAt, source, title, url, urlToImage }, activeArticle, i }) => {
   const classes = useStyles();
+  const [elRefs, setElRefs] = useState([]);
+  const scrollToRef = (ref) => window.scroll(0, ref.current.offsetTop - 50);
 
-  if (!articles.length) {
-    return (
-      <Grow in>
-        <Grid className={classes.container} container alignItems="stretch" spacing={3}>
-          {infoCards.map((infoCard) => (
-            <Grid item xs={12} sm={6} md={4} lg={3} className={classes.infoCard}>
-              <div className={classes.card} style={{ backgroundColor: infoCard.color }}>
-                <Typography variant="h5" component="h5">{infoCard.title}</Typography>
-                {infoCard.info ? <Typography variant="h6" component="h6"><strong>{infoCard.title.split(' ')[2]}</strong>: <br />{infoCard.info}</Typography> : null}
-                <Typography variant="h6" component="h6">Try saying: <br /> <i>{infoCard.text}</i></Typography>
-              </div>
-            </Grid>
-          ))}
-        </Grid>
-      </Grow>
-    );
-  }
+  useEffect(() => {
+    window.scroll(0, 0);
+
+    setElRefs((refs) => Array(20).fill().map((_, j) => refs[j] || createRef()));
+  }, []);
+
+  useEffect(() => {
+    if (i === activeArticle && elRefs[activeArticle]) {
+      scrollToRef(elRefs[activeArticle]);
+    }
+  }, [i, activeArticle, elRefs]);
 
   return (
-    <Grow in>
-      <Grid className={classes.container} container alignItems="stretch" spacing={3}>
-        {articles.map((article, i) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} style={{ display: 'flex' }}>
-            <NewsCard activeArticle={activeArticle} i={i} article={article} />
-          </Grid>
-        ))}
-      </Grid>
-    </Grow>
+    <Card ref={elRefs[i]} className={classNames(classes.card, activeArticle === i ? classes.activeCard : null)}>
+      <CardActionArea href={url} target="_blank">
+        <CardMedia className={classes.media} image={urlToImage || 'https://www.industry.gov.au/sites/default/files/August%202018/image/news-placeholder-738.png'} title={title} />
+        <div className={classes.details}>
+          <Typography variant="body2" color="textSecondary" component="h2">{(new Date(publishedAt)).toDateString()}</Typography>
+          <Typography variant="body2" color="textSecondary" component="h2">{source.name}</Typography>
+        </div>
+        <Typography className={classes.title} gutterBottom variant="h5" component="h2">{title}</Typography>
+        <CardContent>
+          <Typography variant="body2" color="textSecondary" component="p">{description}</Typography>
+        </CardContent>
+      </CardActionArea>
+      <CardActions className={classes.cardActions}>
+        <Button size="small" color="primary" href={url}>Learn More</Button>
+        <Typography variant="h5" color="textSecondary" component="h2">{i + 1}</Typography>
+      </CardActions>
+    </Card>
   );
 };
 
-export default NewsCards;
+export default NewsCard;
